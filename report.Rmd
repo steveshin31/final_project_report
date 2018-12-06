@@ -4,7 +4,7 @@ date: "December 6, 2018"
 output: github_document
 ---
 
-```
+
 
 
 ```{r include=FALSE}
@@ -155,16 +155,13 @@ hate_crime = hate_crime %>%
   filter(state !="")
 ```
   
-<<<<<<< HEAD
-
-=======
   Then we created a dataset containing the annual hate crime rate for each state from 2005 to 2017. This was done by compiling data from the FBI data source and extracting the total number of hate crime incidents and the total population for each state. These values were then used to calculate the hate crime rate (per 100,000 people) by dividing the total incident count by the total population and then multiplying by 100,000. The cleaning portion for this dataset involved converting the list files to tidy data frames and rename columns in reasonable way. In the process of tidying the raw data, some columns were split into two columns resulting in NA's for some values. We resolved this issue by converting the NA's to 0 and then combining the split columns back into one column（taking the sum）. For 2011, 2012, 2014 datasets, we excluded data for Virgin Islands and Guam in order to conduct analyses solely on states. 
  
-  
-
   Next, to create a model for predicting the level of hate crime, we created a dataset composed of possible predictors. The dataset was created by compiling raw data from various sources that included the following predictors for the year 2016: median income, proportion of people with a high school degree, unemployment rate, proportion of non-citizens, proportion of white citizens, proportion of Trump voters. For the hate crime rate dataset, the rate was calculated again by taking the total hate crime incidents for 2016 and dividing by the total population and multiplying by 100,000. Each compiled raw dataset were cleaned for names and the location and the corresponding statistic of interest were extracted. These datasets were then merged to create compiled dataset consisting of states, their respective hate crime rates, and various predictors. Hawaii and its corresponding values were dropped since it contained many missing data. 
+ 
   Lastly, this dataset was finalized by cleaning its variables. We remove the $ symbol from income values, and converting the median household income variable to numeric. In addition, we remove the % symbol from share Trump voters variable and convert them to numeric.
-```{r}
+  
+```{r, eval = FALSE}
 # predictor data in 2016
 income = read_csv("./data/Income.csv") %>% 
   janitor::clean_names()
@@ -281,7 +278,7 @@ hatecrime_count_df %>%
 
   We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident. 
 
-```{r}
+```{r, eval= FALSE}
 
 library(reshape2)
 
@@ -359,12 +356,8 @@ library(readxl)
 library(plotly)
 ```
 
-<<<<<<< HEAD
-##Line plot
 ```{r, eval=FALSE}
-=======
-```{r}
->>>>>>> 372b78f3738394a2621605b8161770b6458270b1
+
 tidy_data = function(data, x){
   data %>% 
   janitor::clean_names() %>% 
