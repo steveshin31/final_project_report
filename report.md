@@ -146,8 +146,6 @@ hate_crime = hate_crime%>%
   filter(state!="")
 ```
 
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-
 Line plot
 ---------
 
@@ -365,80 +363,22 @@ all_data = rbind(hc_2017, hc_2016, hc_2015, hc_2014, hc_2013, hc_2012, hc_2011, 
 # predictor data in 2016
 income = read_csv("./data/Income.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   `Median Annual Household Income` = col_character()
-    ## )
-
-``` r
 unemployment = read_csv("./data/Unemployment.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   Unemployed = col_double()
-    ## )
-
-``` r
 education = read_csv("./data/Educational_level.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   share_population_with_high_school_degree = col_double()
-    ## )
-
-``` r
 ctizenship = read_csv("./data/Ctizenship.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   Citizen = col_double(),
-    ##   `Non-Citizen` = col_double(),
-    ##   Total = col_integer()
-    ## )
-
-``` r
 race = read_csv("./data/Race.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   White = col_double(),
-    ##   Black = col_character(),
-    ##   Hispanic = col_double(),
-    ##   Asian = col_character(),
-    ##   `American Indian/Alaska Native` = col_character(),
-    ##   `Native Hawaiian/Other Pacific Islander` = col_character(),
-    ##   `Two Or More Races` = col_character(),
-    ##   Total = col_integer(),
-    ##   Footnotes = col_integer()
-    ## )
-
-``` r
 vote = read_csv("./data/Vote.csv") %>% 
   janitor::clean_names()
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   share_voters_voted_trump = col_character()
-    ## )
-
-``` r
 crime_rate = read_excel("./data/2016.xls",  range = cell_rows(3:54)) %>%
   janitor::clean_names() %>%
   filter(participating_state != "Total") %>%
@@ -448,15 +388,7 @@ crime_rate = read_excel("./data/2016.xls",  range = cell_rows(3:54)) %>%
 crime_rate_10_days = read_csv("./data/hate_crime_10days.csv") %>%
   janitor::clean_names()%>%
   select(location = state, hate_crime_10_day = hate_crimes_per_100k_splc)
-```
 
-    ## Parsed with column specification:
-    ## cols(
-    ##   state = col_character(),
-    ##   hate_crimes_per_100k_splc = col_double()
-    ## )
-
-``` r
 ctizenship =
   ctizenship %>% 
   select(location, non_citizen)
@@ -547,15 +479,6 @@ We first created a simple plot to see how hate crimes in the U.S. changed from 2
 library(reshape2)
 
 hate_crime_10days<-read_csv("./data/hate_crime_10days.csv")
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   state = col_character(),
-    ##   hate_crimes_per_100k_splc = col_double()
-    ## )
-
-``` r
 hate_crime_ave<-hate_crime %>% 
   na.omit() %>% 
   filter(year==2016) 
@@ -578,8 +501,6 @@ compare_rate %>%
   ggtitle("Hate Crime Rate Before and After Trump Election") +
   labs(y = "Hate Crime Rate (per 100,000)", x = "State")
 ```
-
-![](report_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
 Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
@@ -621,6 +542,49 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
 
 Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
 
+``` r
+# read the data
+hate_crime <- read_csv("./data/hate_crime.csv")
+
+l <- list(color = toRGB("grey"), width = 1)
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlake = F
+)
+
+# the sidebar 
+years = hate_crime %>% distinct(year) %>% pull()
+selectInput("year_choice", label = h3("Select year"),
+            choices = years, selected = "2010")
+
+# plots
+renderPlotly({  
+  hate_crime %>% 
+  filter(year == input$year_choice) %>% 
+  rbind(c(1, input$year_choice, "Hawaii", 0,0,0)) %>% 
+  as.tibble() %>% 
+  arrange(state) %>% 
+  mutate(state = as.factor(state),
+         code = state.abb[state],
+         code = c(code[1:8],'DC',code[9:50]),
+         annualprop = as.numeric(annualprop)
+         ) %>% 
+  select(year,code, everything()) %>% 
+  plot_geo(locationmode = 'USA-states') %>%
+  add_trace(
+    z = ~ annualprop,  locations = ~code,
+    color = ~ annualprop, colors = 'Reds'
+  ) %>%
+  colorbar(title = "Hate crime rate ",limits = c(0,15)) %>%
+  layout(
+    title = 'Annual hate crime rate all over U.S. ',
+        geo = g
+  )
+})
+```
+
 Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states.
 
 Lastly, we created line plots through Shiny to depict the number of hate crime incidents over time for all the specific types of hate crime. The data used in this plots were taken from the hate crime raw data taken from the FBI data source.
@@ -631,163 +595,16 @@ Additional Analysis
 ``` r
 # regression analysis
 sum(is.na(merge_data))
-```
-
-    ## [1] 0
-
-``` r
 mle = lm(crime_rate~median_income+share_unemployed+share_population_with_high_school_degree+share_non_citizen+ share_white+ crime_rate, data = merge_data)
-```
 
-    ## Warning in model.matrix.default(mt, mf, contrasts): the response appeared
-    ## on the right-hand side and was dropped
-
-    ## Warning in model.matrix.default(mt, mf, contrasts): problem with term 6 in
-    ## model.matrix: no columns are assigned
-
-``` r
 # see distribution of crime rate 
 merge_data %>% 
   ggplot(aes(x = crime_rate)) + geom_histogram()
-```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-
-<<<<<<< HEAD
-![](report_files/figure-markdown_github/unnamed-chunk-23-1.png)
-=======
-<<<<<<< HEAD
-![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
-=======
-![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
->>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
-
-``` r
-##do stepwise regerssion elimination
-multi.fit = step(mle, direction = "backward")
-```
-
-    ## Start:  AIC=95.47
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white + crime_rate
-
-    ## Warning in model.matrix.default(object, data = structure(list(crime_rate =
-    ## c(1.3808898651561, : the response appeared on the right-hand side and was
-    ## dropped
-
-    ## Warning in model.matrix.default(object, data = structure(list(crime_rate
-    ## = c(1.3808898651561, : problem with term 6 in model.matrix: no columns are
-    ## assigned
-
-    ## 
-    ## Step:  AIC=95.47
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white
-    ## 
-    ##                                            Df Sum of Sq    RSS    AIC
-    ## - share_population_with_high_school_degree  1    0.4476 265.92 93.559
-    ## - share_non_citizen                         1    3.4486 268.92 94.120
-    ## - share_unemployed                          1    3.6656 269.14 94.160
-    ## - share_white                               1    5.5897 271.06 94.516
-    ## - median_income                             1    8.7930 274.27 95.104
-    ## <none>                                                  265.47 95.474
-    ## 
-    ## Step:  AIC=93.56
-    ## crime_rate ~ median_income + share_unemployed + share_non_citizen + 
-    ##     share_white
-    ## 
-    ##                     Df Sum of Sq    RSS    AIC
-    ## - share_unemployed   1    3.4309 269.35 92.200
-    ## - share_non_citizen  1    4.5181 270.44 92.401
-    ## - share_white        1    5.1956 271.12 92.526
-    ## <none>                           265.92 93.559
-    ## - median_income      1   27.7787 293.70 96.527
-    ## 
-    ## Step:  AIC=92.2
-    ## crime_rate ~ median_income + share_non_citizen + share_white
-    ## 
-    ##                     Df Sum of Sq    RSS    AIC
-    ## - share_non_citizen  1    7.6123 276.96 91.593
-    ## <none>                           269.35 92.200
-    ## - share_white        1   17.9088 287.26 93.418
-    ## - median_income      1   24.5931 293.94 94.568
-    ## 
-    ## Step:  AIC=91.59
-    ## crime_rate ~ median_income + share_white
-    ## 
-    ##                 Df Sum of Sq    RSS    AIC
-    ## - share_white    1    10.736 287.70 91.495
-    ## <none>                       276.96 91.593
-    ## - median_income  1    17.044 294.01 92.579
-    ## 
-    ## Step:  AIC=91.49
-    ## crime_rate ~ median_income
-    ## 
-    ##                 Df Sum of Sq    RSS    AIC
-    ## <none>                       287.70 91.495
-    ## - median_income  1    19.174 306.87 92.721
-
-``` r
-summary(multi.fit)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = crime_rate ~ median_income, data = merge_data)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.7797 -1.3866 -0.5861  0.5338 13.6819 
-    ## 
-    ## Coefficients:
-    ##                 Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)   -1.754e+00  2.325e+00  -0.754    0.454  
-    ## median_income  6.980e-05  3.902e-05   1.789    0.080 .
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 2.448 on 48 degrees of freedom
-    ## Multiple R-squared:  0.06248,    Adjusted R-squared:  0.04295 
-    ## F-statistic: 3.199 on 1 and 48 DF,  p-value: 0.08
->>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
-
-``` r
 #do box cox
 library(MASS)
-```
-
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked from 'package:plotly':
-    ## 
-    ##     select
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
-``` r
 boxcox(mle)
-```
 
-<<<<<<< HEAD
-![](report_files/figure-markdown_github/unnamed-chunk-23-2.png)
-=======
-<<<<<<< HEAD
-    ## Warning in model.matrix.default(mt, mf, contrasts): the response appeared
-    ## on the right-hand side and was dropped
-
-    ## Warning in model.matrix.default(mt, mf, contrasts): problem with term 6 in
-    ## model.matrix: no columns are assigned
-
-![](report_files/figure-markdown_github/unnamed-chunk-6-2.png)
-=======
-![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
->>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
->>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
-
-``` r
 # transform crime rate variable
 merge_data_log = merge_data %>% 
   mutate(crime_rate = log(crime_rate)) 
@@ -797,72 +614,6 @@ mle_log = lm(crime_rate~median_income+share_unemployed+share_population_with_hig
 
 summary(step(mle_log, direction = "backward"))
 ```
-
-    ## Start:  AIC=-17.38
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - share_population_with_high_school_degree  1   0.00712 27.789 -19.369
-    ## - share_non_citizen                         1   0.25928 28.041 -18.918
-    ## - share_white                               1   0.55094 28.333 -18.400
-    ## - median_income                             1   0.74481 28.527 -18.059
-    ## - share_unemployed                          1   0.80726 28.589 -17.950
-    ## <none>                                                  27.782 -17.382
-    ## 
-    ## Step:  AIC=-19.37
-    ## crime_rate ~ median_income + share_unemployed + share_non_citizen + 
-    ##     share_white
-    ## 
-    ##                     Df Sum of Sq    RSS     AIC
-    ## - share_non_citizen  1   0.30720 28.096 -20.820
-    ## - share_white        1   0.58711 28.376 -20.324
-    ## - share_unemployed   1   0.83409 28.623 -19.891
-    ## <none>                           27.789 -19.369
-    ## - median_income      1   1.47558 29.265 -18.782
-    ## 
-    ## Step:  AIC=-20.82
-    ## crime_rate ~ median_income + share_unemployed + share_white
-    ## 
-    ##                    Df Sum of Sq    RSS     AIC
-    ## - share_white       1   0.28076 28.377 -22.322
-    ## - share_unemployed  1   0.62270 28.719 -21.724
-    ## <none>                          28.096 -20.820
-    ## - median_income     1   2.46311 30.559 -18.618
-    ## 
-    ## Step:  AIC=-22.32
-    ## crime_rate ~ median_income + share_unemployed
-    ## 
-    ##                    Df Sum of Sq    RSS     AIC
-    ## - share_unemployed  1   0.34569 28.723 -23.717
-    ## <none>                          28.377 -22.322
-    ## - median_income     1   2.18417 30.561 -20.615
-    ## 
-    ## Step:  AIC=-23.72
-    ## crime_rate ~ median_income
-    ## 
-    ##                 Df Sum of Sq    RSS     AIC
-    ## <none>                       28.723 -23.717
-    ## - median_income  1    1.8561 30.579 -22.586
-
-    ## 
-    ## Call:
-    ## lm(formula = crime_rate ~ median_income, data = merge_data_log)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1.34328 -0.49755  0.00989  0.52203  2.02950 
-    ## 
-    ## Coefficients:
-    ##                 Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)   -7.447e-01  7.347e-01  -1.014   0.3158  
-    ## median_income  2.172e-05  1.233e-05   1.761   0.0846 .
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.7736 on 48 degrees of freedom
-    ## Multiple R-squared:  0.0607, Adjusted R-squared:  0.04113 
-    ## F-statistic: 3.102 on 1 and 48 DF,  p-value: 0.08457
 
 To determine if there were variables that were involved with hate crime rates, we conducted regression analyses. First, we check that there is no missing data in the merge\_data dataset(contains the annual hate crime rate and possible presictors). Then, we explored the distribution of the variables. We noticed that the distribution of our outcome hate crime rate was skewed. So we used Box-Cox to discover a good transformation. Based on the Box-Cox plot, we transformed these values using log. To find the best model, we performed stepwise regression elimination on common socioeconomics predictors that included household median income, proportion unemployed, proportion with high school degree, proportion of whites, and the proportion of non-citizens. In the end of the selection process, the model only contained household median income, and was itself not too significant of a factor(P-Value = 0.0854082).
 
@@ -875,108 +626,10 @@ merge_data_log = merge_data_log %>%
 mle_log_1 = lm(crime_rate~median_income+share_unemployed+share_population_with_high_school_degree+share_non_citizen+ share_white+ share_voters_voted_trump, data = merge_data_log)
   
 summary(step(mle_log_1, direction = "both"))
-```
 
-    ## Start:  AIC=-24.44
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white + share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - share_population_with_high_school_degree  1    0.0613 23.241 -26.304
-    ## - median_income                             1    0.0895 23.270 -26.244
-    ## - share_non_citizen                         1    0.1421 23.322 -26.131
-    ## - share_unemployed                          1    0.4039 23.584 -25.573
-    ## <none>                                                  23.180 -24.436
-    ## - share_white                               1    1.1517 24.332 -24.012
-    ## - share_voters_voted_trump                  1    4.6017 27.782 -17.382
-    ## 
-    ## Step:  AIC=-26.3
-    ## crime_rate ~ median_income + share_unemployed + share_non_citizen + 
-    ##     share_white + share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - median_income                             1    0.0308 23.272 -28.238
-    ## - share_non_citizen                         1    0.2163 23.458 -27.841
-    ## - share_unemployed                          1    0.4481 23.689 -27.349
-    ## <none>                                                  23.241 -26.304
-    ## - share_white                               1    1.1205 24.362 -25.950
-    ## + share_population_with_high_school_degree  1    0.0613 23.180 -24.436
-    ## - share_voters_voted_trump                  1    4.5475 27.789 -19.369
-    ## 
-    ## Step:  AIC=-28.24
-    ## crime_rate ~ share_unemployed + share_non_citizen + share_white + 
-    ##     share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - share_non_citizen                         1    0.3131 23.585 -29.570
-    ## - share_unemployed                          1    0.4176 23.690 -29.349
-    ## <none>                                                  23.272 -28.238
-    ## - share_white                               1    1.2118 24.484 -27.700
-    ## + median_income                             1    0.0308 23.241 -26.304
-    ## + share_population_with_high_school_degree  1    0.0026 23.270 -26.244
-    ## - share_voters_voted_trump                  1    5.9923 29.265 -18.782
-    ## 
-    ## Step:  AIC=-29.57
-    ## crime_rate ~ share_unemployed + share_white + share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - share_unemployed                          1    0.2042 23.789 -31.139
-    ## <none>                                                  23.585 -29.570
-    ## - share_white                               1    1.0313 24.616 -29.430
-    ## + share_non_citizen                         1    0.3131 23.272 -28.238
-    ## + median_income                             1    0.1276 23.458 -27.841
-    ## + share_population_with_high_school_degree  1    0.0008 23.584 -27.572
-    ## - share_voters_voted_trump                  1    6.9740 30.559 -18.618
-    ## 
-    ## Step:  AIC=-31.14
-    ## crime_rate ~ share_white + share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## - share_white                               1    0.8458 24.635 -31.392
-    ## <none>                                                  23.789 -31.139
-    ## + share_unemployed                          1    0.2042 23.585 -29.570
-    ## + share_non_citizen                         1    0.0997 23.690 -29.349
-    ## + share_population_with_high_school_degree  1    0.0303 23.759 -29.203
-    ## + median_income                             1    0.0178 23.772 -29.177
-    ## - share_voters_voted_trump                  1    6.7878 30.577 -20.588
-    ## 
-    ## Step:  AIC=-31.39
-    ## crime_rate ~ share_voters_voted_trump
-    ## 
-    ##                                            Df Sum of Sq    RSS     AIC
-    ## <none>                                                  24.635 -31.392
-    ## + share_white                               1    0.8458 23.789 -31.139
-    ## + share_population_with_high_school_degree  1    0.2158 24.419 -29.832
-    ## + share_non_citizen                         1    0.1420 24.493 -29.681
-    ## + median_income                             1    0.0595 24.576 -29.513
-    ## + share_unemployed                          1    0.0187 24.616 -29.430
-    ## - share_voters_voted_trump                  1    5.9435 30.579 -22.586
-
-    ## 
-    ## Call:
-    ## lm(formula = crime_rate ~ share_voters_voted_trump, data = merge_data_log)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -1.4448 -0.4594  0.1266  0.5046  1.3476 
-    ## 
-    ## Coefficients:
-    ##                           Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                 2.0337     0.4519   4.500 4.32e-05 ***
-    ## share_voters_voted_trump -306.2861    90.0042  -3.403  0.00135 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.7164 on 48 degrees of freedom
-    ## Multiple R-squared:  0.1944, Adjusted R-squared:  0.1776 
-    ## F-statistic: 11.58 on 1 and 48 DF,  p-value: 0.001353
-
-``` r
 ##see the correlation between trump and income
 cor(merge_data_log$share_voters_voted_trump, merge_data_log$median_income)
 ```
-
-    ## [1] -0.4705399
 
 Not satisfied by the relatively insignificant results, we then repeated the process with all the previously included variables in addition to the proportion of Trump voters. After stepwise elimination, median household income was replaced by the proportion of Trump voters as the only significant predictor with a much lower p-value (P-Value = 0.0033187). We determined the correlation between the factors share of Trump voters and median household income and saw that they were relatively highly correlated. This potential source of multicollinearity could have served as a possible explanation for why median household income was dropped while the proportion of Trump voters was deemed highly significant. We observed a negative association between the hate crime rate and the proportion of Trump voters. We decided to include both simple linear regression models in our report.
 
@@ -986,14 +639,7 @@ crime_income_slr = lm(crime_rate~median_income, data = merge_data_log)
 summary(crime_income_slr) %>%
   broom::tidy() %>%
   knitr::kable()
-```
 
-| term           |    estimate|  std.error|  statistic|    p.value|
-|:---------------|-----------:|----------:|----------:|----------:|
-| (Intercept)    |  -0.7447166|  0.7347082|  -1.013622|  0.3158453|
-| median\_income |   0.0000217|  0.0000123|   1.761218|  0.0845705|
-
-``` r
 scatter_plot_1 = merge_data_log %>%
   ggplot(aes(x = median_income,y = crime_rate)) +
   geom_smooth(method = "lm", color = "blue", formula = y ~ x) +
@@ -1014,14 +660,7 @@ crime_trump_slr = lm(crime_rate~share_voters_voted_trump, data = merge_data_log)
 summary(crime_trump_slr) %>%
   broom::tidy() %>%
   knitr::kable()
-```
 
-| term                        |     estimate|  std.error|  statistic|    p.value|
-|:----------------------------|------------:|----------:|----------:|----------:|
-| (Intercept)                 |     2.033682|   0.451947|   4.499824|  0.0000432|
-| share\_voters\_voted\_trump |  -306.286084|  90.004206|  -3.403020|  0.0013531|
-
-``` r
 scatter_plot_2 = merge_data_log %>%
   ggplot(aes(x = share_voters_voted_trump, y = crime_rate)) +
   geom_smooth(method = "lm", color = "blue", formula = y ~ x) +
