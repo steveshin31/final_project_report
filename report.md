@@ -274,6 +274,217 @@ mutate(median_annual_household_income = as.numeric(median_annual_household_incom
   mutate(share_voters_voted_trump = as.numeric(share_voters_voted_trump)/100)
 ```
 
+Line plot
+---------
+
+``` r
+tidy_data = function(data, x){
+  data %>% 
+  janitor::clean_names() %>% 
+  select(table_1, x_1) %>% 
+  filter(str_detect(table_1, "Anti")) %>% 
+  mutate(type = "i",
+         year = x) 
+}
+
+hc_2017 = read_xls("./data/table-1.xls")
+hc_2016 = read_xls("./data/2016_hatecrime.xls")
+hc_2015 = read_xls("./data/2015_hatecrime.xls")
+hc_2014 = read_xls("./data/2014_hatecrime.xls")
+hc_2013 = read_xls("./data/2013_hatecrime.xls")
+hc_2012 = read_xls("./data/2012_hatecrime.xls")
+hc_2011 = read_xls("./data/2011_hatecrime.xls")
+hc_2010 = read_xls("./data/2010_hatecrime.xls")
+hc_2009 = read_xls("./data/2009_hatecrime.xls")
+hc_2008 = read_xls("./data/2008_hatecrime.xls")
+hc_2007 = read_xls("./data/2007_hatecrime.xls")
+hc_2006 = read_xls("./data/2006_hatecrime.xls")
+hc_2005 = read_xls("./data/2005_hatecrime.xls")
+
+change_name = function(data){
+  data %>% 
+  filter(type != "i") %>% 
+  mutate(table_1 = str_replace(table_1, "Anti-American Indian or Alaska Native","Anti-American Indian/Alaskan Native"),
+         table_1 = str_replace(table_1, " or African American", ""),
+         table_1 = str_replace(table_1, " or Latino", ""),
+         table_1 = str_replace(table_1, " \\(Muslim\\)", ""),
+         table_1 = str_replace(table_1, "Lesbian", "Female Homosexual"),
+         table_1 = str_replace(table_1, "Gay \\(Male\\)", "Male Homosexual"),
+         table_1 = str_replace(table_1, "Female Homosexual, Gay\\, Bisexual\\, or Transgender \\(Mixed Group\\)", "Homosexual"))
+  
+}
+```
+
+``` r
+hc_2017 = tidy_data(hc_2017, 2017)
+
+hc_2017$type[1:9] = "race"
+hc_2017$type[10:23] = "religion"
+hc_2017$type[24:28] = "sexual orientation"
+
+hc_2017 = 
+  change_name(hc_2017) %>%   
+  filter(table_1 != "Anti-Asian") %>% 
+  mutate(table_1 = str_replace(table_1,"Anti-Native Hawaiian or Other Pacific Islander", "Anti-Asian/Pacific Islander"))
+
+hc_2017$x_1[4] = 147
+```
+
+``` r
+hc_2016 = tidy_data(hc_2016, 2016)
+
+hc_2016$type[1:9] = "race"
+hc_2016$type[10:23] = "religion"
+hc_2016$type[24:28] = "sexual orientation"
+
+hc_2016 = 
+  change_name(hc_2016) %>% 
+  filter(table_1 != "Anti-Asian") %>%
+  mutate(table_1 = str_replace(table_1,"Anti-Native Hawaiian or Other Pacific Islander", "Anti-Asian/Pacific Islander"))
+
+hc_2016$x_1[4] = 122
+```
+
+``` r
+hc_2015 = tidy_data(hc_2015, 2015)
+
+hc_2015$type[1:9] = "race"
+hc_2015$type[10:23] = "religion"
+hc_2015$type[24:28] = "sexual orientation"
+
+hc_2015 = 
+  change_name(hc_2015) %>% 
+  filter(table_1 != "Anti-Asian") %>%
+  mutate(table_1 = str_replace(table_1,"Anti-Native Hawaiian or Other Pacific Islander", "Anti-Asian/Pacific Islander"))
+
+hc_2015$x_1[4] = 115
+```
+
+``` r
+hc_2014 = tidy_data(hc_2014, 2014)
+
+hc_2014$type[1:6] = "race"
+hc_2014$type[7:13] = "religion"
+hc_2014$type[14:18] = "sexual orientation"
+
+hc_2014 = 
+  change_name(hc_2014) %>% 
+  filter(table_1 != "Anti-Asian") %>%
+  mutate(table_1 = str_replace(table_1,"Anti-Native Hawaiian or Other Pacific Islander", "Anti-Asian/Pacific Islander"))
+
+hc_2014$x_1[4] = 143
+```
+
+``` r
+hc_2013 = tidy_data(hc_2013, 2013)
+
+hc_2013$type[1:6] = "race"
+hc_2013$type[19] = "race"
+hc_2013$type[7:13] = "religion"
+hc_2013$type[14:18] = "sexual orientation"
+
+hc_2013 = 
+  change_name(hc_2013) %>% 
+  filter(table_1 != "Anti-Asian") %>%
+  mutate(table_1 = str_replace(table_1,"Anti-Native Hawaiian or Other Pacific Islander", "Anti-Asian/Pacific Islander"))
+
+hc_2013$x_1[4] = 138
+```
+
+``` r
+hc_2012 = tidy_data(hc_2012, 2012) 
+
+hc_2012$type[1:5] = "race"
+hc_2012$type[18] = "race"
+hc_2012$type[6:12] = "religion"
+hc_2012$type[13:17] = "sexual orientation"
+
+hc_2012 = hc_2012 %>% filter(type != "i")
+```
+
+``` r
+hc_2011 = tidy_data(hc_2011, 2011)
+
+hc_2011$type[1:5] = "race"
+hc_2011$type[18] = "race"
+hc_2011$type[6:12] = "religion"
+hc_2011$type[13:17] = "sexual orientation"
+
+hc_2011 = hc_2011 %>% filter(type != "i")
+```
+
+``` r
+hc_2010 = tidy_data(hc_2010, 2010) 
+
+hc_2010$type[1:5] = "race"
+hc_2010$type[18] = "race"
+hc_2010$type[6:12] = "religion"
+hc_2010$type[13:17] = "sexual orientation"
+
+hc_2010 = hc_2010 %>% filter(type != "i")
+```
+
+``` r
+hc_2009 = tidy_data(hc_2009, 2009) 
+
+hc_2009$type[1:5] = "race"
+hc_2009$type[18] = "race"
+hc_2009$type[6:12] = "religion"
+hc_2009$type[13:17] = "sexual orientation"
+
+hc_2009 = hc_2009 %>% filter(type != "i")
+```
+
+``` r
+hc_2008 = tidy_data(hc_2008, 2008) 
+
+hc_2008$type[1:5] = "race"
+hc_2008$type[18] = "race"
+hc_2008$type[6:12] = "religion"
+hc_2008$type[13:17] = "sexual orientation"
+
+hc_2008 = hc_2008 %>% filter(type != "i")
+```
+
+``` r
+hc_2007 = tidy_data(hc_2007, 2007) 
+
+hc_2007$type[1:5] = "race"
+hc_2007$type[18] = "race"
+hc_2007$type[6:12] = "religion"
+hc_2007$type[13:17] = "sexual orientation"
+
+hc_2007 = hc_2007 %>% filter(type != "i")
+```
+
+``` r
+hc_2006 = tidy_data(hc_2006, 2006) 
+
+hc_2006$type[1:5] = "race"
+hc_2006$type[18] = "race"
+hc_2006$type[6:12] = "religion"
+hc_2006$type[13:17] = "sexual orientation"
+
+hc_2006 = hc_2006 %>% filter(type != "i")
+```
+
+``` r
+hc_2005 = tidy_data(hc_2005, 2005) 
+
+hc_2005$type[1:5] = "race"
+hc_2005$type[18] = "race"
+hc_2005$type[6:12] = "religion"
+hc_2005$type[13:17] = "sexual orientation"
+
+hc_2005 = hc_2005 %>% filter(type != "i")
+```
+
+``` r
+all_data = rbind(hc_2017, hc_2016, hc_2015, hc_2014, hc_2013, hc_2012, hc_2011, hc_2010, hc_2009, hc_2008, hc_2007, hc_2006, hc_2005) %>% 
+  as.tibble() %>% 
+  mutate(x_1 = as.numeric(x_1))
+```
+
 To create the line chart showing the number of different kinds of hate crime incidents during 2005 to 2017, we combined the annual data from FBI. The merged dataset contains year, the incidents of hate crime, three type of hate crime motivation we want to see:"race", "religion" and "sexual orientation" and the specific bias motivation. FBI changed the way they categoried three types of hate crime at 2013 and 2015, we make some change to the categorical name to make the plot more presentable over years. We change the type name from "Anti-Black or African American" to "Anti-Black", "Anti-American Indian or Alaska Native" to "Anti-American Indian/Alaskan Native", "Anti-Islamic (Muslim)" to "Anti-Islamic", "Anti-Gay (Male)" to "Anti-Male Homosexual", "Anti-Lesbian" to "Anti-Female Homosexual" and "Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed Group)" to "Anti-Homosexual" in order to make them identical with previous years. From 2005 to 2014, the "Anti-Hispanic or Latino" hate crime is categorized as "Ethnicity", we change it as "race". Also since 2013, FBI seperate "Anti-Asian" and "Anti-Native Hawaiian or Other Pacific Islander", we combine there two type as one.
 
 *FBI data resource，state division：*
@@ -330,9 +541,83 @@ hatecrime_count_df %>%
 
 We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident.
 
+``` r
+library(reshape2)
+
+hate_crime_10days<-read_csv("./data/hate_crime_10days.csv")
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   state = col_character(),
+    ##   hate_crimes_per_100k_splc = col_double()
+    ## )
+
+``` r
+hate_crime_ave<-hate_crime %>% 
+  na.omit() %>% 
+  filter(year==2016) 
+
+
+compare_rate<-merge(hate_crime_10days, hate_crime_ave, by= "state")
+
+compare_rate %>% 
+  mutate(hate_crimes_10days = hate_crimes_per_100k_splc/10 * 365,
+         hate_crimes_2016 = annualprop) %>% 
+  select(state, hate_crimes_10days, hate_crimes_2016) %>% 
+  melt(, id = "state") %>% 
+  mutate(state = factor(state, levels = state %>% unique %>% sort(decreasing = T))) %>% 
+  mutate(state = reorder(state, value)) %>% 
+  ggplot(aes(x = state, y = value, fill = variable, group = variable))+
+  geom_bar(stat="identity", position = "dodge", width = 0.5)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60))+
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 0, size = 10, hjust = 1),legend.position = "right") +
+  ggtitle("Hate Crime Rate Before and After Trump Election") +
+  labs(y = "Hate Crime Rate (per 100,000)", x = "State")
+```
+
+![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
 Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
-Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016. When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
+``` r
+map_data_2016 = merge_data %>%
+  rbind(c("Hawaii",71223,   0.034, 0.904,   0 ,0.81, '33.1%', 0 ,0)) %>% 
+  as.tibble() %>% 
+  arrange(state)
+
+map_data<-map_data_2016 %>%         
+  mutate(
+         state = as.factor(state),
+         code = state.abb[state],
+         code = c(code[1:8],'DC',code[9:50]),
+         hover = with(map_data_2016, paste(state,'<br>' ,"share for trump",share_voters_voted_trump)),
+         crime_rate = as.numeric(crime_rate)
+         ) %>% 
+  select(code, crime_rate, hover)
+
+l <- list(color = toRGB("grey"), width = 1)
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = F
+)
+
+
+plot_geo(map_data, locationmode = 'USA-states') %>%
+  add_trace(
+    z = ~ crime_rate, text = ~hover, locations = ~code,
+    color = ~ crime_rate, colors = 'Reds',marker = list(line = l)
+  ) %>%
+  colorbar(title = "Hate crime rate ") %>%
+  layout(
+    title = 'Hate crime rate in 2016 all over U.S. ',
+    geo = g
+  )
+```
+
+Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
 
 Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states.
 
@@ -366,7 +651,99 @@ merge_data %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
+<<<<<<< HEAD
 ![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
+=======
+![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+``` r
+##do stepwise regerssion elimination
+multi.fit = step(mle, direction = "backward")
+```
+
+    ## Start:  AIC=95.47
+    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
+    ##     share_non_citizen + share_white + crime_rate
+
+    ## Warning in model.matrix.default(object, data = structure(list(crime_rate =
+    ## c(1.3808898651561, : the response appeared on the right-hand side and was
+    ## dropped
+
+    ## Warning in model.matrix.default(object, data = structure(list(crime_rate
+    ## = c(1.3808898651561, : problem with term 6 in model.matrix: no columns are
+    ## assigned
+
+    ## 
+    ## Step:  AIC=95.47
+    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
+    ##     share_non_citizen + share_white
+    ## 
+    ##                                            Df Sum of Sq    RSS    AIC
+    ## - share_population_with_high_school_degree  1    0.4476 265.92 93.559
+    ## - share_non_citizen                         1    3.4486 268.92 94.120
+    ## - share_unemployed                          1    3.6656 269.14 94.160
+    ## - share_white                               1    5.5897 271.06 94.516
+    ## - median_income                             1    8.7930 274.27 95.104
+    ## <none>                                                  265.47 95.474
+    ## 
+    ## Step:  AIC=93.56
+    ## crime_rate ~ median_income + share_unemployed + share_non_citizen + 
+    ##     share_white
+    ## 
+    ##                     Df Sum of Sq    RSS    AIC
+    ## - share_unemployed   1    3.4309 269.35 92.200
+    ## - share_non_citizen  1    4.5181 270.44 92.401
+    ## - share_white        1    5.1956 271.12 92.526
+    ## <none>                           265.92 93.559
+    ## - median_income      1   27.7787 293.70 96.527
+    ## 
+    ## Step:  AIC=92.2
+    ## crime_rate ~ median_income + share_non_citizen + share_white
+    ## 
+    ##                     Df Sum of Sq    RSS    AIC
+    ## - share_non_citizen  1    7.6123 276.96 91.593
+    ## <none>                           269.35 92.200
+    ## - share_white        1   17.9088 287.26 93.418
+    ## - median_income      1   24.5931 293.94 94.568
+    ## 
+    ## Step:  AIC=91.59
+    ## crime_rate ~ median_income + share_white
+    ## 
+    ##                 Df Sum of Sq    RSS    AIC
+    ## - share_white    1    10.736 287.70 91.495
+    ## <none>                       276.96 91.593
+    ## - median_income  1    17.044 294.01 92.579
+    ## 
+    ## Step:  AIC=91.49
+    ## crime_rate ~ median_income
+    ## 
+    ##                 Df Sum of Sq    RSS    AIC
+    ## <none>                       287.70 91.495
+    ## - median_income  1    19.174 306.87 92.721
+
+``` r
+summary(multi.fit)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = crime_rate ~ median_income, data = merge_data)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.7797 -1.3866 -0.5861  0.5338 13.6819 
+    ## 
+    ## Coefficients:
+    ##                 Estimate Std. Error t value Pr(>|t|)  
+    ## (Intercept)   -1.754e+00  2.325e+00  -0.754    0.454  
+    ## median_income  6.980e-05  3.902e-05   1.789    0.080 .
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 2.448 on 48 degrees of freedom
+    ## Multiple R-squared:  0.06248,    Adjusted R-squared:  0.04295 
+    ## F-statistic: 3.199 on 1 and 48 DF,  p-value: 0.08
+>>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
 
 ``` r
 #do box cox
@@ -388,6 +765,7 @@ library(MASS)
 boxcox(mle)
 ```
 
+<<<<<<< HEAD
     ## Warning in model.matrix.default(mt, mf, contrasts): the response appeared
     ## on the right-hand side and was dropped
 
@@ -395,6 +773,9 @@ boxcox(mle)
     ## model.matrix: no columns are assigned
 
 ![](report_files/figure-markdown_github/unnamed-chunk-6-2.png)
+=======
+![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
+>>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
 
 ``` r
 # transform crime rate variable
@@ -659,6 +1040,25 @@ Next, to see what predictors were significant factors in predicting hate crime r
 A second model was created by performing stepwise elimination on the same predictors in addition to the propotion of the population that voted for Trump. Interestingly, when this additional predictor was added, the final model had dropped median household income and contained only the share of Trump voters as a significant predictor. This predictor again had a negative association with our outcome, meaning states with higher proportions of Trump voters had lower hate crime rates.
 
 These regression analyses had unexpected results, but several limitations could serve as possible explanations for this. First, it is known that socioeconomic factors such as income and education level are correlated with each other, which could have influenced the models. Additionally, we looked into the correlation between the predictors share of Trump voters and median household income and saw that they were relatively highly correlated (-0.47). This multicollinearity may have resulted in median household income no longer being a significant factor. Secondly, since this was data regarding states, there were only 51 observations. This low sample size could have inflated the variability, resulting in poor predictive models. Lastly, when looking at the scatter plots of the predictors and the outcome, there was no clear linear relationship. Therefore, forcing a linear regression may have resulted in the poorly predicting models. All in all, we would recommend that readers view these regression results with skepticism. For future regression analyses, we suggest that sample sizes be increased and more predictors to be included to create better predicting and more interpretable models. The Shiny app included a heat map of the U.S. and line charts. The heat map depicted the hate crime rate for each state for the years 2005 to 2017. It seemed that states in the west coast and east coast had generally higher hate crime rates. States with majority Republican support such as the mid-region states (Idaho, Nort and South Dakota, Oklahoma, etc.) tended to have lower hate crime rates. Majority Democratic support states such as Washington, California, or Massachusetts tended to have higher hate crime rates. This pattern may be due to the fact that since Democratic states have larger populations of Libertarians, there may be more hate crimes commited on these individuals than in Republican states with low numbers of Liberals. Overall, the hate crime rates for the states had an upward trend as the years increased.
+
+``` r
+types = all_data %>% distinct(type) %>% pull()
+
+selectInput("type_choice", label = h3("type of hatecrime"),
+            choices = types, selected = "race")
+            
+            
+            
+            
+renderPlotly({
+  all_data %>% 
+    filter(type == input$type_choice) %>% 
+    plot_ly(x = ~year, y = ~x_1, color = ~table_1, type = "scatter", mode = "lines") %>% 
+  layout(legend = list(orientation = "h", font = list(size = 8)),
+         yaxis = list(title = "Number of incidents"),
+         xaxis = list(title = "Year"))
+})
+```
 
 Finally, the line chart was used to show the number of incidents for every specific type of bias motivation from 2005 to 2017. The motivations were separated into three categories: "race", "religion" and "sexual orientation". The most common type of motivation in "race" was "anti-black"; after 2008 the incident number decreased over the years, but from 2016 to 2017, it increased again. All types of race motivation hate crime increased comparing 2017 to 2016. For "religion", the most common type of motivation was "anti- Jewish". Similar to "anti-black" hate crime, the incidents number has a decreasing trend since 2008, but started to increase at 2014 and reached a peak at 2017. "Anti-Islamic" hate crime increased significantly since 2014 and reached a peak at 2016. As for sexual orientation, "anti-male homosexual" hate crime was the biggest incident number. The number does not change significantly over the years. We were surprised to see that "anti-Arab" was one of the lowest in incidents amongst race motivated hate crimes. Additionally, we were surprised to see that "anti-Jewish" was the highest in religion motivated hate crimes, while "anti-Islamic" was a distant second. However, since the data only represents up to 2017, the number of hate crimes for these biases might not yet reflect the current sentiments in 2018 America, which has increasingly shown anger towards Islamic nations.
 
