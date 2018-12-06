@@ -1,7 +1,14 @@
 Report
 ================
-Kee-Young Shin
 December 6, 2018
+
+| Name           | Uni    |
+|----------------|--------|
+| Kee-Young Shin | ks3663 |
+| Runqi Ma       | rm3609 |
+| Zixu Wang      | zw2541 |
+| Man Luo        | lm4239 |
+| Jingyu Xu      | jx2371 |
 
 Motivation
 ----------
