@@ -1,4 +1,4 @@
-Report
+Hate Crime Over the Past Decade
 ================
 December 6, 2018
 

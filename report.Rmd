@@ -1,5 +1,5 @@
 ---
-title: "Report"
+title: "Hate Crime Over the Past Decade"
 date: "December 6, 2018"
 output: github_document
 ---
