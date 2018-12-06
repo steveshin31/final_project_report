@@ -41,7 +41,11 @@ How do hate crimes differ by state?
   As we progressed through the project, some new questions arised. To see if the election affected hate crime rates, we wanted to find the relationship between the amount of Trump voters to the level of hate crime. Additionally, we wanted to find out if certain variables could be used to predict hate crime rate. 
 
 ## Data
+<<<<<<< HEAD
 ```{r, eval = F}
+=======
+```{r, eval=FALSE}
+>>>>>>> 8da6c8b566e0cdea8e04dc53a39c8dfb81009a02
 # read in crime data 
 hate_offenses_2017 = read_xls("./data/table-1.xls") %>% 
   janitor::clean_names() %>% 
@@ -126,7 +130,7 @@ colnames(hatecrime_count_df) = c("year", "total_incidents", "total_offenses")
   We first created a dataset containing the number of hate crime incidents and offenses from 2005 to 2017 by compiling the yearly hate crime data from the FBI data source (the links to the datasets are provided below). We excluded the number of victims and known offenders also offered by these datasets, since they were not releveant to our analysis. The variable names were changed using colnames since the raw data did not have these variable names.  
 
   
-```{r}
+```{r, eval=FALSE}
 library(tidyverse)
 library(readxl)
 #list
@@ -155,6 +159,9 @@ hate_crime = hate_crime %>%
   filter(state !="")
 ```
   
+<<<<<<< HEAD
+
+=======
   Then we created a dataset containing the annual hate crime rate for each state from 2005 to 2017. This was done by compiling data from the FBI data source and extracting the total number of hate crime incidents and the total population for each state. These values were then used to calculate the hate crime rate (per 100,000 people) by dividing the total incident count by the total population and then multiplying by 100,000. The cleaning portion for this dataset involved converting the list files to tidy data frames and rename columns in reasonable way. In the process of tidying the raw data, some columns were split into two columns resulting in NA's for some values. We resolved this issue by converting the NA's to 0 and then combining the split columns back into one column（taking the sum）. For 2011, 2012, 2014 datasets, we excluded data for Virgin Islands and Guam in order to conduct analyses solely on states. 
  
   
@@ -348,6 +355,7 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
   
   
   Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states. 
+>>>>>>> 372b78f3738394a2621605b8161770b6458270b1
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(tidyverse)
@@ -355,7 +363,12 @@ library(readxl)
 library(plotly)
 ```
 
+<<<<<<< HEAD
+##Line plot
+```{r, eval=FALSE}
+=======
 ```{r}
+>>>>>>> 372b78f3738394a2621605b8161770b6458270b1
 tidy_data = function(data, x){
   data %>% 
   janitor::clean_names() %>% 
@@ -394,7 +407,7 @@ change_name = function(data){
 ```
  
  
-```{r}
+```{r, eval=FALSE}
 hc_2017 = tidy_data(hc_2017, 2017)
 
 hc_2017$type[1:9] = "race"
@@ -409,7 +422,7 @@ hc_2017 =
 hc_2017$x_1[4] = 147
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2016 = tidy_data(hc_2016, 2016)
 
 hc_2016$type[1:9] = "race"
@@ -424,7 +437,7 @@ hc_2016 =
 hc_2016$x_1[4] = 122
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2015 = tidy_data(hc_2015, 2015)
 
 hc_2015$type[1:9] = "race"
@@ -440,7 +453,7 @@ hc_2015$x_1[4] = 115
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 hc_2014 = tidy_data(hc_2014, 2014)
 
 hc_2014$type[1:6] = "race"
@@ -456,7 +469,7 @@ hc_2014$x_1[4] = 143
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 hc_2013 = tidy_data(hc_2013, 2013)
 
 hc_2013$type[1:6] = "race"
@@ -472,7 +485,7 @@ hc_2013 =
 hc_2013$x_1[4] = 138
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2012 = tidy_data(hc_2012, 2012) 
 
 hc_2012$type[1:5] = "race"
@@ -483,7 +496,7 @@ hc_2012$type[13:17] = "sexual orientation"
 hc_2012 = hc_2012 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2011 = tidy_data(hc_2011, 2011)
 
 hc_2011$type[1:5] = "race"
@@ -494,7 +507,7 @@ hc_2011$type[13:17] = "sexual orientation"
 hc_2011 = hc_2011 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2010 = tidy_data(hc_2010, 2010) 
 
 hc_2010$type[1:5] = "race"
@@ -505,7 +518,7 @@ hc_2010$type[13:17] = "sexual orientation"
 hc_2010 = hc_2010 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2009 = tidy_data(hc_2009, 2009) 
 
 hc_2009$type[1:5] = "race"
@@ -516,7 +529,7 @@ hc_2009$type[13:17] = "sexual orientation"
 hc_2009 = hc_2009 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2008 = tidy_data(hc_2008, 2008) 
 
 hc_2008$type[1:5] = "race"
@@ -527,7 +540,7 @@ hc_2008$type[13:17] = "sexual orientation"
 hc_2008 = hc_2008 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2007 = tidy_data(hc_2007, 2007) 
 
 hc_2007$type[1:5] = "race"
@@ -538,7 +551,7 @@ hc_2007$type[13:17] = "sexual orientation"
 hc_2007 = hc_2007 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2006 = tidy_data(hc_2006, 2006) 
 
 hc_2006$type[1:5] = "race"
@@ -549,7 +562,7 @@ hc_2006$type[13:17] = "sexual orientation"
 hc_2006 = hc_2006 %>% filter(type != "i")
 ```
 
-```{r}
+```{r, eval=FALSE}
 hc_2005 = tidy_data(hc_2005, 2005) 
 
 hc_2005$type[1:5] = "race"
@@ -561,11 +574,23 @@ hc_2005 = hc_2005 %>% filter(type != "i")
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 all_data = rbind(hc_2017, hc_2016, hc_2015, hc_2014, hc_2013, hc_2012, hc_2011, hc_2010, hc_2009, hc_2008, hc_2007, hc_2006, hc_2005) %>% 
   as.tibble() %>% 
   mutate(x_1 = as.numeric(x_1))
 ```
+<<<<<<< HEAD
+  
+  
+=======
+  Next, to create a model for predicting the level of hate crime, we created a dataset composed of possible predictors. The dataset was created by compiling raw data from various sources that included the following predictors for the year 2016: median income, proportion of people with a high school degree, unemployment rate, proportion of non-citizens, proportion of white citizens, proportion of Trump voters. For the hate crime rate dataset, the rate was calculated again by taking the total hate crime incidents for 2016 and dividing by the total population and multiplying by 100,000. Each compiled raw dataset were cleaned for names and the location and the corresponding statistic of interest were extracted. These datasets were then merged to create compiled dataset consisting of states, their respective hate crime rates, and various predictors. Hawaii and its corresponding values were dropped since it contained many missing data. 
+  Lastly, this dataset was finalized by cleaning its variables. We remove the $ symbol from income values, and converting the median household income variable to numeric. In addition, we remove the % symbol from share Trump voters variable and convert them to numeric.
+```{r, eval=FALSE}
+# predictor data in 2016
+income = read_csv("./data/Income.csv") %>% 
+  janitor::clean_names()
+=======
+>>>>>>> 372b78f3738394a2621605b8161770b6458270b1
 
 ```{r, eval=FALSE}
 types = all_data %>% distinct(type) %>% pull()
@@ -595,7 +620,7 @@ https://www.splcenter.org/20161129/ten-days-after-harassment-and-intimidation-af
   
 ## Exploratory Analysis 
 
-```{r eval=FALSE }
+```{r, eval=FALSE }
 # plot change in number of hate crimes over time
 hatecrime_count_df %>% 
   plot_ly(x = ~year, y = ~total_incidents, type = "scatter", mode = "line") %>% 
@@ -605,7 +630,11 @@ hatecrime_count_df %>%
 
   We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident. 
 
+<<<<<<< HEAD
+```{r, eval=FALSE}
+=======
 ```{r , eval= F}
+>>>>>>> 372b78f3738394a2621605b8161770b6458270b1
 
 library(reshape2)
 
@@ -676,7 +705,49 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
 ![Aaron Swartz](https://raw.githubusercontent.com/steveshin31/final_project_report/master/plots/map%20for%202016.jpg)
   
   Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value. 
-  
+
+```{r, eval=FALSE}
+# read the data
+hate_crime <- read_csv("./data/hate_crime.csv")
+
+l <- list(color = toRGB("grey"), width = 1)
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlake = F
+)
+
+# the sidebar 
+years = hate_crime %>% distinct(year) %>% pull()
+selectInput("year_choice", label = h3("Select year"),
+            choices = years, selected = "2010")
+
+# plots
+renderPlotly({  
+  hate_crime %>% 
+  filter(year == input$year_choice) %>% 
+  rbind(c(1, input$year_choice, "Hawaii", 0,0,0)) %>% 
+  as.tibble() %>% 
+  arrange(state) %>% 
+  mutate(state = as.factor(state),
+         code = state.abb[state],
+         code = c(code[1:8],'DC',code[9:50]),
+         annualprop = as.numeric(annualprop)
+         ) %>% 
+  select(year,code, everything()) %>% 
+  plot_geo(locationmode = 'USA-states') %>%
+  add_trace(
+    z = ~ annualprop,  locations = ~code,
+    color = ~ annualprop, colors = 'Reds'
+  ) %>%
+  colorbar(title = "Hate crime rate ",limits = c(0,15)) %>%
+  layout(
+    title = 'Annual hate crime rate all over U.S. ',
+        geo = g
+  )
+})
+```  
   Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states. 
   
 >>>>>>> 431232e9f2718884ba12225c5ab5cc772328ca52
@@ -684,7 +755,7 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
   
 ## Additional Analysis
 
-```{r}
+```{r, eval=FALSE}
 # regression analysis
 sum(is.na(merge_data))
 mle = lm(crime_rate~median_income+share_unemployed+share_population_with_high_school_degree+share_non_citizen+ share_white+ crime_rate, data = merge_data)
@@ -709,7 +780,7 @@ summary(step(mle_log, direction = "backward"))
   
   To determine if there were variables that were involved with hate crime rates, we conducted regression analyses. First, we check that there is no missing data in the merge_data dataset(contains the annual hate crime rate and possible presictors). Then, we explored the distribution of the variables. We noticed that the distribution of our outcome hate crime rate was skewed. So we used Box-Cox to discover a good transformation. Based on the Box-Cox plot, we transformed these values using log. To find the best model, we performed stepwise regression elimination on common socioeconomics predictors that included household median income, proportion unemployed, proportion with high school degree, proportion of whites, and the proportion of non-citizens. In the end of the selection process, the model only contained household median income, and was itself not too significant of a factor(P-Value = 0.0854082). 
 
-```{r}
+```{r, eval=FALSE}
 # input Trump preditor 
 merge_data_log = merge_data_log %>%
   mutate(share_voters_voted_trump = sub("\\%", "",share_voters_voted_trump)) %>%
@@ -726,7 +797,7 @@ cor(merge_data_log$share_voters_voted_trump, merge_data_log$median_income)
 
   Not satisfied by the relatively insignificant results, we then repeated the process with all the previously included variables in addition to the proportion of Trump voters. After stepwise elimination, median household income was replaced by the proportion of Trump voters as the only significant predictor with a much lower p-value (P-Value = 0.0033187). We determined the correlation between the factors share of Trump voters and median household income and saw that they were relatively highly correlated. This potential source of multicollinearity could have served as a possible explanation for why median household income was dropped while the proportion of Trump voters was deemed highly significant. We observed a negative association between the hate crime rate and the proportion of Trump voters. We decided to include both simple linear regression models in our report.
 
-```{r}
+```{r, eval=FALSE}
 # show results for model 1
 crime_income_slr = lm(crime_rate~median_income, data = merge_data_log)
 summary(crime_income_slr) %>%
@@ -748,7 +819,7 @@ scatter_plot_1 = merge_data_log %>%
   We output the results for model 1 by creating a tidy table. Additionally, we included the scatter plot showing relationship between median household income and hate crime rate. Geom smooth was used to input the fitted line and its confidence intervals. 
 
 
-```{r}
+```{r, eval=FALSE}
 # results for model 2
 crime_trump_slr = lm(crime_rate~share_voters_voted_trump, data = merge_data_log)
 summary(crime_trump_slr) %>%
