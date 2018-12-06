@@ -547,15 +547,6 @@ We first created a simple plot to see how hate crimes in the U.S. changed from 2
 library(reshape2)
 
 hate_crime_10days<-read_csv("./data/hate_crime_10days.csv")
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   state = col_character(),
-    ##   hate_crimes_per_100k_splc = col_double()
-    ## )
-
-``` r
 hate_crime_ave<-hate_crime %>% 
   na.omit() %>% 
   filter(year==2016) 
@@ -579,9 +570,7 @@ compare_rate %>%
   labs(y = "Hate Crime Rate (per 100,000)", x = "State")
 ```
 
-![](report_files/figure-markdown_github/unnamed-chunk-21-1.png)
-
-Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
+![Aaron Swartz](https://raw.githubusercontent.com/PeteWang68/final_project/master/voting_files/figure-html/unnamed-chunk-4-1.png) Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
 ``` r
 map_data_2016 = merge_data %>%
@@ -619,6 +608,8 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
   )
 ```
 
+![Aaron Swartz](https://raw.githubusercontent.com/steveshin31/final_project_report/master/plots/map%20for%202016.jpg)
+
 Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
 
 Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states.
@@ -653,103 +644,7 @@ merge_data %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-<<<<<<< HEAD
 ![](report_files/figure-markdown_github/unnamed-chunk-23-1.png)
-=======
-<<<<<<< HEAD
-![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
-=======
-![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
->>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
-
-``` r
-##do stepwise regerssion elimination
-multi.fit = step(mle, direction = "backward")
-```
-
-    ## Start:  AIC=95.47
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white + crime_rate
-
-    ## Warning in model.matrix.default(object, data = structure(list(crime_rate =
-    ## c(1.3808898651561, : the response appeared on the right-hand side and was
-    ## dropped
-
-    ## Warning in model.matrix.default(object, data = structure(list(crime_rate
-    ## = c(1.3808898651561, : problem with term 6 in model.matrix: no columns are
-    ## assigned
-
-    ## 
-    ## Step:  AIC=95.47
-    ## crime_rate ~ median_income + share_unemployed + share_population_with_high_school_degree + 
-    ##     share_non_citizen + share_white
-    ## 
-    ##                                            Df Sum of Sq    RSS    AIC
-    ## - share_population_with_high_school_degree  1    0.4476 265.92 93.559
-    ## - share_non_citizen                         1    3.4486 268.92 94.120
-    ## - share_unemployed                          1    3.6656 269.14 94.160
-    ## - share_white                               1    5.5897 271.06 94.516
-    ## - median_income                             1    8.7930 274.27 95.104
-    ## <none>                                                  265.47 95.474
-    ## 
-    ## Step:  AIC=93.56
-    ## crime_rate ~ median_income + share_unemployed + share_non_citizen + 
-    ##     share_white
-    ## 
-    ##                     Df Sum of Sq    RSS    AIC
-    ## - share_unemployed   1    3.4309 269.35 92.200
-    ## - share_non_citizen  1    4.5181 270.44 92.401
-    ## - share_white        1    5.1956 271.12 92.526
-    ## <none>                           265.92 93.559
-    ## - median_income      1   27.7787 293.70 96.527
-    ## 
-    ## Step:  AIC=92.2
-    ## crime_rate ~ median_income + share_non_citizen + share_white
-    ## 
-    ##                     Df Sum of Sq    RSS    AIC
-    ## - share_non_citizen  1    7.6123 276.96 91.593
-    ## <none>                           269.35 92.200
-    ## - share_white        1   17.9088 287.26 93.418
-    ## - median_income      1   24.5931 293.94 94.568
-    ## 
-    ## Step:  AIC=91.59
-    ## crime_rate ~ median_income + share_white
-    ## 
-    ##                 Df Sum of Sq    RSS    AIC
-    ## - share_white    1    10.736 287.70 91.495
-    ## <none>                       276.96 91.593
-    ## - median_income  1    17.044 294.01 92.579
-    ## 
-    ## Step:  AIC=91.49
-    ## crime_rate ~ median_income
-    ## 
-    ##                 Df Sum of Sq    RSS    AIC
-    ## <none>                       287.70 91.495
-    ## - median_income  1    19.174 306.87 92.721
-
-``` r
-summary(multi.fit)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = crime_rate ~ median_income, data = merge_data)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.7797 -1.3866 -0.5861  0.5338 13.6819 
-    ## 
-    ## Coefficients:
-    ##                 Estimate Std. Error t value Pr(>|t|)  
-    ## (Intercept)   -1.754e+00  2.325e+00  -0.754    0.454  
-    ## median_income  6.980e-05  3.902e-05   1.789    0.080 .
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 2.448 on 48 degrees of freedom
-    ## Multiple R-squared:  0.06248,    Adjusted R-squared:  0.04295 
-    ## F-statistic: 3.199 on 1 and 48 DF,  p-value: 0.08
->>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
 
 ``` r
 #do box cox
@@ -771,21 +666,13 @@ library(MASS)
 boxcox(mle)
 ```
 
-<<<<<<< HEAD
-![](report_files/figure-markdown_github/unnamed-chunk-23-2.png)
-=======
-<<<<<<< HEAD
     ## Warning in model.matrix.default(mt, mf, contrasts): the response appeared
     ## on the right-hand side and was dropped
 
     ## Warning in model.matrix.default(mt, mf, contrasts): problem with term 6 in
     ## model.matrix: no columns are assigned
 
-![](report_files/figure-markdown_github/unnamed-chunk-6-2.png)
-=======
-![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
->>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
->>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
+![](report_files/figure-markdown_github/unnamed-chunk-23-2.png)
 
 ``` r
 # transform crime rate variable

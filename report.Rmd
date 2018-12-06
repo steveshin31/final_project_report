@@ -492,9 +492,10 @@ hatecrime_count_df %>%
   layout(title = "Change In Total Hate Crime Incidents From 2005 to 2017")
 ```
 
+
   We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident. 
 
-```{r}
+```{r , eval= F}
 
 library(reshape2)
 
@@ -521,7 +522,8 @@ compare_rate %>%
   ggtitle("Hate Crime Rate Before and After Trump Election") +
   labs(y = "Hate Crime Rate (per 100,000)", x = "State")
 ```
-  
+
+ ![Aaron Swartz](https://raw.githubusercontent.com/PeteWang68/final_project/master/voting_files/figure-html/unnamed-chunk-4-1.png) 
   Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365. 
 
 ```{r, eval= F}
@@ -559,6 +561,9 @@ plot_geo(map_data, locationmode = 'USA-states') %>%
     geo = g
   )
 ```
+  
+  
+![Aaron Swartz](https://raw.githubusercontent.com/steveshin31/final_project_report/master/plots/map%20for%202016.jpg)
   
   Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value. 
   
