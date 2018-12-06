@@ -1,7 +1,14 @@
-Report
+Hate Crime Over the Past Decade
 ================
-Kee-Young Shin
 December 6, 2018
+
+| Name           | Uni    |
+|----------------|--------|
+| Kee-Young Shin | ks3663 |
+| Runqi Ma       | rm3609 |
+| Zixu Wang      | zw2541 |
+| Man Luo        | lm4239 |
+| Jingyu Xu      | jx2371 |
 
 Motivation
 ----------
@@ -25,7 +32,88 @@ As we progressed through the project, some new questions arised. To see if the e
 Data
 ----
 
-We first created a dataset containing the number of hate crime incidents and offenses from 2005 to 2017 by compiling the yearly hate crime data from the FBI data source (the links to the datasets are provided below). We excluded the number of victims and known offenders also offered by these datasets, since they were not releveant to our analysis.
+``` r
+# read in crime data 
+hate_offenses_2017 = read_xls("./data/table-1.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2017"))
+
+hate_offenses_2016 = read_xls("./data/2016_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2016")) %>% 
+  select(1:5)
+
+hate_offenses_2015 = read_xls("./data/2015_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2015"))
+    
+hate_offenses_2014 = read_xls("./data/2014_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2014")) %>% 
+  select(1:5)
+
+hate_offenses_2013 = read_xls("./data/2013_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2013")) %>% 
+  select(1:5)
+
+hate_offenses_2012 = read_xls("./data/2011_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2012"))
+
+hate_offenses_2011 = read_xls("./data/2011_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2011"))
+
+hate_offenses_2010 = read_xls("./data/2010_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2010"))
+
+hate_offenses_2009 = read_xls("./data/2009_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2009"))
+
+hate_offenses_2008 = read_xls("./data/2008_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2008"))
+
+hate_offenses_2007 = read_xls("./data/2007_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2007"))
+
+hate_offenses_2006 = read_xls("./data/2006_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2006"))
+
+hate_offenses_2005 = read_xls("./data/2005_hatecrime.xls") %>% 
+  janitor::clean_names() %>% 
+  filter(table_1 == "Total") %>% 
+  mutate(table_1 = str_replace(table_1, "Total", "2005"))
+
+# aggregate data for all years
+hatecrime_count_df = rbind(hate_offenses_2017, hate_offenses_2016, hate_offenses_2015, 
+                           hate_offenses_2014, hate_offenses_2013, hate_offenses_2012,
+                           hate_offenses_2011, hate_offenses_2010, hate_offenses_2009,
+                           hate_offenses_2008, hate_offenses_2007, hate_offenses_2006,
+                           hate_offenses_2005) %>% 
+  select(1:3) 
+  
+colnames(hatecrime_count_df) = c("year", "total_incidents", "total_offenses")
+```
+
+We first created a dataset containing the number of hate crime incidents and offenses from 2005 to 2017 by compiling the yearly hate crime data from the FBI data source (the links to the datasets are provided below). We excluded the number of victims and known offenders also offered by these datasets, since they were not releveant to our analysis. The variable names were changed using colnames since the raw data did not have these variable names.
 
 Then we created a dataset containing the annual hate crime rate for each state from 2005 to 2017. This was done by compiling data from the FBI data source and extracting the total number of hate crime incidents and the total population for each state. These values were then used to calculate the hate crime rate (per 100,000 people) by dividing the total incident count by the total population and then multiplying by 100,000. The cleaning portion for this dataset involved converting the list files to tidy data frames and rename columns in reasonable way. In the process of tidying the raw data, some columns were split into two columns resulting in NA's for some values. We resolved this issue by converting the NA's to 0 and then combining the split columns back into one column（taking the sum）. For 2011, 2012, 2014 datasets, we excluded data for Virgin Islands and Guam in order to conduct analyses solely on states.
 
@@ -247,7 +335,14 @@ To create the line chart showing the number of different kinds of hate crime inc
 Exploratory Analysis
 --------------------
 
-We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart that depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts for simplicity, since there could be multiple offenses commited per incident.
+``` r
+# plot change in number of hate crimes over time
+hatecrime_count_df %>% 
+  plot_ly(x = ~year, y = ~total_incidents, type = "scatter", mode = "line") %>% 
+  layout(title = "Change In Total Hate Crime Incidents From 2005 to 2017")
+```
+
+We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident.
 
 Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
