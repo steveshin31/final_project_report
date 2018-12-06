@@ -32,7 +32,14 @@ As we progressed through the project, some new questions arised. To see if the e
 Data
 ----
 
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+
 ``` r
+=======
+```
+
+``` r
+>>>>>>> 8da6c8b566e0cdea8e04dc53a39c8dfb81009a02
 # read in crime data 
 hate_offenses_2017 = read_xls("./data/table-1.xls") %>% 
   janitor::clean_names() %>% 
@@ -592,6 +599,8 @@ hatecrime_count_df %>%
   plot_ly(x = ~year, y = ~total_incidents, type = "scatter", mode = "line") %>% 
   layout(title = "Change In Total Hate Crime Incidents From 2005 to 2017")
 ```
+
+![Aaron Swartz](https://raw.githubusercontent.com/steveshin31/final_project_report/master/plots/2005-2017.jpg)
 
 We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident.
 
