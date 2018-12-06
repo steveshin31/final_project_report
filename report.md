@@ -583,9 +583,6 @@ renderPlotly({
 })
 ```
 
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-=================================
-
 *Share of 2016 U.S. presidential voters who voted for Donald Trump:* <https://projects.fivethirtyeight.com/2016-swing-the-election/>
 
 *The hate crime rate from 11.09.2016 to 11.18.2016:* <https://www.splcenter.org/20161129/ten-days-after-harassment-and-intimidation-aftermath-election>
@@ -604,15 +601,7 @@ hatecrime_count_df %>%
 
 We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident.
 
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-
 ``` r
-=======
-```
-
-``` r
->>>>>>> 372b78f3738394a2621605b8161770b6458270b1
-
 library(reshape2)
 
 hate_crime_10days<-read_csv("./data/hate_crime_10days.csv")
@@ -724,9 +713,7 @@ renderPlotly({
 })
 ```
 
-Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states.
-
-> > > > > > > 431232e9f2718884ba12225c5ab5cc772328ca52 Lastly, we created line plots through Shiny to depict the number of hate crime incidents over time for all the specific types of hate crime. The data used in this plots were taken from the hate crime raw data taken from the FBI data source.
+Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states. Lastly, we created line plots through Shiny to depict the number of hate crime incidents over time for all the specific types of hate crime. The data used in this plots were taken from the hate crime raw data taken from the FBI data source.
 
 Additional Analysis
 -------------------
