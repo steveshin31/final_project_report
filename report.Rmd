@@ -524,7 +524,7 @@ compare_rate %>%
   
   Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365. 
 
-```{r}
+```{r, eval= F}
 map_data_2016 = merge_data %>%
   rbind(c("Hawaii",71223,	0.034, 0.904,	0 ,0.81, '33.1%', 0 ,0)) %>% 
   as.tibble() %>% 

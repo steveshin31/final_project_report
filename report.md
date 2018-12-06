@@ -146,133 +146,7 @@ hate_crime = hate_crime%>%
   filter(state!="")
 ```
 
-Next, to create a model for predicting the level of hate crime, we created a dataset composed of possible predictors. The dataset was created by compiling raw data from various sources that included the following predictors for the year 2016: median income, proportion of people with a high school degree, unemployment rate, proportion of non-citizens, proportion of white citizens, proportion of Trump voters. For the hate crime rate dataset, the rate was calculated again by taking the total hate crime incidents for 2016 and dividing by the total population and multiplying by 100,000. Each compiled raw dataset were cleaned for names and the location and the corresponding statistic of interest were extracted. These datasets were then merged to create compiled dataset consisting of states, their respective hate crime rates, and various predictors. Hawaii and its corresponding values were dropped since it contained many missing data. Lastly, this dataset was finalized by cleaning its variables. We remove the $ symbol from income values, and converting the median household income variable to numeric. In addition, we remove the % symbol from share Trump voters variable and convert them to numeric.
-
-``` r
-# predictor data in 2016
-income = read_csv("./data/Income.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   `Median Annual Household Income` = col_character()
-    ## )
-
-``` r
-unemployment = read_csv("./data/Unemployment.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   Unemployed = col_double()
-    ## )
-
-``` r
-education = read_csv("./data/Educational_level.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   share_population_with_high_school_degree = col_double()
-    ## )
-
-``` r
-ctizenship = read_csv("./data/Ctizenship.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   Citizen = col_double(),
-    ##   `Non-Citizen` = col_double(),
-    ##   Total = col_integer()
-    ## )
-
-``` r
-race = read_csv("./data/Race.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   White = col_double(),
-    ##   Black = col_character(),
-    ##   Hispanic = col_double(),
-    ##   Asian = col_character(),
-    ##   `American Indian/Alaska Native` = col_character(),
-    ##   `Native Hawaiian/Other Pacific Islander` = col_character(),
-    ##   `Two Or More Races` = col_character(),
-    ##   Total = col_integer(),
-    ##   Footnotes = col_integer()
-    ## )
-
-``` r
-vote = read_csv("./data/Vote.csv") %>% 
-  janitor::clean_names()
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   Location = col_character(),
-    ##   share_voters_voted_trump = col_character()
-    ## )
-
-``` r
-crime_rate = read_excel("./data/2016.xls",  range = cell_rows(3:54)) %>%
-  janitor::clean_names() %>%
-  filter(participating_state != "Total") %>%
-  select(location = participating_state, population_covered,       total_number_of_incidents_reported) %>%
-  mutate(crime_rate = total_number_of_incidents_reported/population_covered*100000)
-
-crime_rate_10_days = read_csv("./data/hate_crime_10days.csv") %>%
-  janitor::clean_names()%>%
-  select(location = state, hate_crime_10_day = hate_crimes_per_100k_splc)
-```
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   state = col_character(),
-    ##   hate_crimes_per_100k_splc = col_double()
-    ## )
-
-``` r
-ctizenship =
-  ctizenship %>% 
-  select(location, non_citizen)
-
-race =
-  race %>% 
-  select(location, white)
-
-crime_rate =
-  crime_rate %>% 
-  select(location, crime_rate)
-
-merge_data = 
-  merge(income, unemployment, by = "location") %>% 
-  merge(., education, by = "location") %>% 
-  merge(., ctizenship, by = "location") %>% 
-  merge(., race, by = "location") %>% 
-  merge(., vote, by = "location") %>%
-  merge(., crime_rate, by = "location") %>%
-  merge(., crime_rate_10_days, by = "location") %>%
-  filter(location != "United States") %>% 
-  rename(state = location, share_unemployed = unemployed, share_non_citizen = non_citizen, share_white = white)%>%
-  mutate(median_annual_household_income = str_replace(median_annual_household_income, ",", "")) %>%
-  mutate(median_annual_household_income = gsub("\\$", "",median_annual_household_income )) %>%
-mutate(median_annual_household_income = as.numeric(median_annual_household_income)) %>%
-  select(state, median_income = median_annual_household_income, everything())%>%
-  mutate(share_voters_voted_trump = sub("\\%", "",share_voters_voted_trump))%>%
-  mutate(share_voters_voted_trump = as.numeric(share_voters_voted_trump)/100)
-```
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
 
 Line plot
 ---------
@@ -485,7 +359,135 @@ all_data = rbind(hc_2017, hc_2016, hc_2015, hc_2014, hc_2013, hc_2012, hc_2011, 
   mutate(x_1 = as.numeric(x_1))
 ```
 
-To create the line chart showing the number of different kinds of hate crime incidents during 2005 to 2017, we combined the annual data from FBI. The merged dataset contains year, the incidents of hate crime, three type of hate crime motivation we want to see:"race", "religion" and "sexual orientation" and the specific bias motivation. FBI changed the way they categoried three types of hate crime at 2013 and 2015, we make some change to the categorical name to make the plot more presentable over years. We change the type name from "Anti-Black or African American" to "Anti-Black", "Anti-American Indian or Alaska Native" to "Anti-American Indian/Alaskan Native", "Anti-Islamic (Muslim)" to "Anti-Islamic", "Anti-Gay (Male)" to "Anti-Male Homosexual", "Anti-Lesbian" to "Anti-Female Homosexual" and "Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed Group)" to "Anti-Homosexual" in order to make them identical with previous years. From 2005 to 2014, the "Anti-Hispanic or Latino" hate crime is categorized as "Ethnicity", we change it as "race". Also since 2013, FBI seperate "Anti-Asian" and "Anti-Native Hawaiian or Other Pacific Islander", we combine there two type as one.
+======= Next, to create a model for predicting the level of hate crime, we created a dataset composed of possible predictors. The dataset was created by compiling raw data from various sources that included the following predictors for the year 2016: median income, proportion of people with a high school degree, unemployment rate, proportion of non-citizens, proportion of white citizens, proportion of Trump voters. For the hate crime rate dataset, the rate was calculated again by taking the total hate crime incidents for 2016 and dividing by the total population and multiplying by 100,000. Each compiled raw dataset were cleaned for names and the location and the corresponding statistic of interest were extracted. These datasets were then merged to create compiled dataset consisting of states, their respective hate crime rates, and various predictors. Hawaii and its corresponding values were dropped since it contained many missing data. Lastly, this dataset was finalized by cleaning its variables. We remove the $ symbol from income values, and converting the median household income variable to numeric. In addition, we remove the % symbol from share Trump voters variable and convert them to numeric.
+
+``` r
+# predictor data in 2016
+income = read_csv("./data/Income.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   `Median Annual Household Income` = col_character()
+    ## )
+
+``` r
+unemployment = read_csv("./data/Unemployment.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   Unemployed = col_double()
+    ## )
+
+``` r
+education = read_csv("./data/Educational_level.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   share_population_with_high_school_degree = col_double()
+    ## )
+
+``` r
+ctizenship = read_csv("./data/Ctizenship.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   Citizen = col_double(),
+    ##   `Non-Citizen` = col_double(),
+    ##   Total = col_integer()
+    ## )
+
+``` r
+race = read_csv("./data/Race.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   White = col_double(),
+    ##   Black = col_character(),
+    ##   Hispanic = col_double(),
+    ##   Asian = col_character(),
+    ##   `American Indian/Alaska Native` = col_character(),
+    ##   `Native Hawaiian/Other Pacific Islander` = col_character(),
+    ##   `Two Or More Races` = col_character(),
+    ##   Total = col_integer(),
+    ##   Footnotes = col_integer()
+    ## )
+
+``` r
+vote = read_csv("./data/Vote.csv") %>% 
+  janitor::clean_names()
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Location = col_character(),
+    ##   share_voters_voted_trump = col_character()
+    ## )
+
+``` r
+crime_rate = read_excel("./data/2016.xls",  range = cell_rows(3:54)) %>%
+  janitor::clean_names() %>%
+  filter(participating_state != "Total") %>%
+  select(location = participating_state, population_covered,       total_number_of_incidents_reported) %>%
+  mutate(crime_rate = total_number_of_incidents_reported/population_covered*100000)
+
+crime_rate_10_days = read_csv("./data/hate_crime_10days.csv") %>%
+  janitor::clean_names()%>%
+  select(location = state, hate_crime_10_day = hate_crimes_per_100k_splc)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   state = col_character(),
+    ##   hate_crimes_per_100k_splc = col_double()
+    ## )
+
+``` r
+ctizenship =
+  ctizenship %>% 
+  select(location, non_citizen)
+
+race =
+  race %>% 
+  select(location, white)
+
+crime_rate =
+  crime_rate %>% 
+  select(location, crime_rate)
+
+merge_data = 
+  merge(income, unemployment, by = "location") %>% 
+  merge(., education, by = "location") %>% 
+  merge(., ctizenship, by = "location") %>% 
+  merge(., race, by = "location") %>% 
+  merge(., vote, by = "location") %>%
+  merge(., crime_rate, by = "location") %>%
+  merge(., crime_rate_10_days, by = "location") %>%
+  filter(location != "United States") %>% 
+  rename(state = location, share_unemployed = unemployed, share_non_citizen = non_citizen, share_white = white)%>%
+  mutate(median_annual_household_income = str_replace(median_annual_household_income, ",", "")) %>%
+  mutate(median_annual_household_income = gsub("\\$", "",median_annual_household_income )) %>%
+mutate(median_annual_household_income = as.numeric(median_annual_household_income)) %>%
+  select(state, median_income = median_annual_household_income, everything())%>%
+  mutate(share_voters_voted_trump = sub("\\%", "",share_voters_voted_trump))%>%
+  mutate(share_voters_voted_trump = as.numeric(share_voters_voted_trump)/100)
+```
+
+> > > > > > > 3e09ecca87ec9734aef57b01c1ddcb5444f23e4d To create the line chart showing the number of different kinds of hate crime incidents during 2005 to 2017, we combined the annual data from FBI. The merged dataset contains year, the incidents of hate crime, three type of hate crime motivation we want to see:"race", "religion" and "sexual orientation" and the specific bias motivation. FBI changed the way they categoried three types of hate crime at 2013 and 2015, we make some change to the categorical name to make the plot more presentable over years. We change the type name from "Anti-Black or African American" to "Anti-Black", "Anti-American Indian or Alaska Native" to "Anti-American Indian/Alaskan Native", "Anti-Islamic (Muslim)" to "Anti-Islamic", "Anti-Gay (Male)" to "Anti-Male Homosexual", "Anti-Lesbian" to "Anti-Female Homosexual" and "Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed Group)" to "Anti-Homosexual" in order to make them identical with previous years. From 2005 to 2014, the "Anti-Hispanic or Latino" hate crime is categorized as "Ethnicity", we change it as "race". Also since 2013, FBI seperate "Anti-Asian" and "Anti-Native Hawaiian or Other Pacific Islander", we combine there two type as one.
 
 *FBI data resource，state division：*
 
@@ -577,7 +579,7 @@ compare_rate %>%
   labs(y = "Hate Crime Rate (per 100,000)", x = "State")
 ```
 
-![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](report_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
 Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
@@ -652,7 +654,7 @@ merge_data %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](report_files/figure-markdown_github/unnamed-chunk-23-1.png)
 
 ``` r
 ##do stepwise regerssion elimination
@@ -762,7 +764,7 @@ library(MASS)
 boxcox(multi.fit)
 ```
 
-![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
+![](report_files/figure-markdown_github/unnamed-chunk-23-2.png)
 
 ``` r
 # transform crime rate variable
