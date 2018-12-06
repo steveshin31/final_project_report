@@ -628,9 +628,8 @@ Lastly, we created line plots through Shiny to depict the number of hate crime i
 Additional Analysis
 -------------------
 
-To determine if there were variables that were involved with hate crime rates, we conducted regression analyses. First, we check that there is no missing data in the merge\_data dataset(contains the annual hate crime rate and possible presictors). Then, we explored the distribution of the variables. We noticed that the distribution of our outcome hate crime rate was skewed and we used Box-Cox to discover a good transformation. Based on the Box-Cox plot, we transformed these values using log. To find the best model, we performed stepwise regression elimination on common socioeconomics predictors that included household median income, proportion unemployed, proportion with high school degree, proportion of whites, and the proportion of non-citizens. In the end of the selection process, the model only contained household median income, and was itself not too significant of a factor(P-Value = 0.0854082). \#\# regression part
-
 ``` r
+# regression analysis
 sum(is.na(merge_data))
 ```
 
@@ -654,7 +653,14 @@ merge_data %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
+<<<<<<< HEAD
 ![](report_files/figure-markdown_github/unnamed-chunk-23-1.png)
+=======
+<<<<<<< HEAD
+![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
+=======
+![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
+>>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
 
 ``` r
 ##do stepwise regerssion elimination
@@ -743,6 +749,7 @@ summary(multi.fit)
     ## Residual standard error: 2.448 on 48 degrees of freedom
     ## Multiple R-squared:  0.06248,    Adjusted R-squared:  0.04295 
     ## F-statistic: 3.199 on 1 and 48 DF,  p-value: 0.08
+>>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
 
 ``` r
 #do box cox
@@ -761,16 +768,31 @@ library(MASS)
     ##     select
 
 ``` r
-boxcox(multi.fit)
+boxcox(mle)
 ```
 
+<<<<<<< HEAD
 ![](report_files/figure-markdown_github/unnamed-chunk-23-2.png)
+=======
+<<<<<<< HEAD
+    ## Warning in model.matrix.default(mt, mf, contrasts): the response appeared
+    ## on the right-hand side and was dropped
+
+    ## Warning in model.matrix.default(mt, mf, contrasts): problem with term 6 in
+    ## model.matrix: no columns are assigned
+
+![](report_files/figure-markdown_github/unnamed-chunk-6-2.png)
+=======
+![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
+>>>>>>> 836a8cf69efa75c2bb56abb9b4a29617d9b49b2a
+>>>>>>> db78eb3c0a16422a2ee16ff87393324bb8c4747a
 
 ``` r
 # transform crime rate variable
 merge_data_log = merge_data %>% 
   mutate(crime_rate = log(crime_rate)) 
 
+# fit regression
 mle_log = lm(crime_rate~median_income+share_unemployed+share_population_with_high_school_degree+share_non_citizen+ share_white, data = merge_data_log)
 
 summary(step(mle_log, direction = "backward"))
@@ -842,12 +864,12 @@ summary(step(mle_log, direction = "backward"))
     ## Multiple R-squared:  0.0607, Adjusted R-squared:  0.04113 
     ## F-statistic: 3.102 on 1 and 48 DF,  p-value: 0.08457
 
-see whether Trump rate influence the model
-------------------------------------------
+To determine if there were variables that were involved with hate crime rates, we conducted regression analyses. First, we check that there is no missing data in the merge\_data dataset(contains the annual hate crime rate and possible presictors). Then, we explored the distribution of the variables. We noticed that the distribution of our outcome hate crime rate was skewed. So we used Box-Cox to discover a good transformation. Based on the Box-Cox plot, we transformed these values using log. To find the best model, we performed stepwise regression elimination on common socioeconomics predictors that included household median income, proportion unemployed, proportion with high school degree, proportion of whites, and the proportion of non-citizens. In the end of the selection process, the model only contained household median income, and was itself not too significant of a factor(P-Value = 0.0854082).
 
 ``` r
-merge_data_log = merge_data_log%>%
-  mutate(share_voters_voted_trump = sub("\\%", "",share_voters_voted_trump))%>%
+# input Trump preditor 
+merge_data_log = merge_data_log %>%
+  mutate(share_voters_voted_trump = sub("\\%", "",share_voters_voted_trump)) %>%
   mutate(share_voters_voted_trump = as.numeric(share_voters_voted_trump)/100)
 
 mle_log_1 = lm(crime_rate~median_income+share_unemployed+share_population_with_high_school_degree+share_non_citizen+ share_white+ share_voters_voted_trump, data = merge_data_log)
@@ -956,25 +978,63 @@ cor(merge_data_log$share_voters_voted_trump, merge_data_log$median_income)
 
     ## [1] -0.4705399
 
-show the final regression model
--------------------------------
+Not satisfied by the relatively insignificant results, we then repeated the process with all the previously included variables in addition to the proportion of Trump voters. After stepwise elimination, median household income was replaced by the proportion of Trump voters as the only significant predictor with a much lower p-value (P-Value = 0.0033187). We determined the correlation between the factors share of Trump voters and median household income and saw that they were relatively highly correlated. This potential source of multicollinearity could have served as a possible explanation for why median household income was dropped while the proportion of Trump voters was deemed highly significant. We observed a negative association between the hate crime rate and the proportion of Trump voters. We decided to include both simple linear regression models in our report.
 
-### the final model 1 crime&income
+``` r
+# show results for model 1
+crime_income_slr = lm(crime_rate~median_income, data = merge_data_log)
+summary(crime_income_slr) %>%
+  broom::tidy() %>%
+  knitr::kable()
+```
 
 | term           |    estimate|  std.error|  statistic|    p.value|
 |:---------------|-----------:|----------:|----------:|----------:|
 | (Intercept)    |  -0.7447166|  0.7347082|  -1.013622|  0.3158453|
 | median\_income |   0.0000217|  0.0000123|   1.761218|  0.0845705|
 
-the final model 2 crime~Trump&income
-------------------------------------
+``` r
+scatter_plot_1 = merge_data_log %>%
+  ggplot(aes(x = median_income,y = crime_rate)) +
+  geom_smooth(method = "lm", color = "blue", formula = y ~ x) +
+  geom_point() +
+  labs(
+    title = "Scatterplot between hate crime rate and Median annual household income",
+    x = "Median annual household income",
+    y = "Log transformation of hate crime rate(per 100,000 population)",
+    caption = "Data from FBI"
+  )
+```
+
+We output the results for model 1 by creating a tidy table. Additionally, we included the scatter plot showing relationship between median household income and hate crime rate. Geom smooth was used to input the fitted line and its confidence intervals.
+
+``` r
+# results for model 2
+crime_trump_slr = lm(crime_rate~share_voters_voted_trump, data = merge_data_log)
+summary(crime_trump_slr) %>%
+  broom::tidy() %>%
+  knitr::kable()
+```
 
 | term                        |     estimate|  std.error|  statistic|    p.value|
 |:----------------------------|------------:|----------:|----------:|----------:|
 | (Intercept)                 |     2.033682|   0.451947|   4.499824|  0.0000432|
 | share\_voters\_voted\_trump |  -306.286084|  90.004206|  -3.403020|  0.0013531|
 
-Not satisfied by the relatively insignificant results, we then repeated the process with all the previously included variables in addition to the proportion of Trump voters. After stepwise elimination, median household income was replaced by the proportion of Trump voters as the only significant predictor with a much lower p-value (P-Value = 0.0033187). We determined the correlation between the factors share of Trump voters and median household income and saw that they were relatively highly correlated. This potential source of multicollinearity could have served as a possible explanation for why median household income was dropped while the proportion of Trump voters was deemed highly significant. We observed a negative association between the hate crime rate and the proportion of Trump voters. We included both simple linear regression models in our report.
+``` r
+scatter_plot_2 = merge_data_log %>%
+  ggplot(aes(x = share_voters_voted_trump, y = crime_rate)) +
+  geom_smooth(method = "lm", color = "blue", formula = y ~ x) +
+  geom_point() +
+  labs(
+    title = "Scatterplot between hate crime rate and shared voters who voted Trump",
+    x = "shared voters voted Trump",
+    y = "Log transformation of Hate crime rate(per 100,000 population)",
+    caption = "Data from FBI"
+  ) 
+```
+
+We showed the output for model 2 in the same manner as we did for model 1. Scatter plots were again included depicting the relationship between proprotion of voters that voted for Trump and hate crime rate.
 
 Discussion
 ----------
