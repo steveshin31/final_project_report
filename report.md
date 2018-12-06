@@ -119,20 +119,6 @@ Then we created a dataset containing the annual hate crime rate for each state f
 
 ``` r
 library(tidyverse)
-```
-
-    ## -- Attaching packages ------------------------------------------------------------------------------ tidyverse 1.2.1 --
-
-    ## v ggplot2 3.0.0     v purrr   0.2.5
-    ## v tibble  1.4.2     v dplyr   0.7.8
-    ## v tidyr   0.8.1     v stringr 1.3.1
-    ## v readr   1.1.1     v forcats 0.3.0
-
-    ## -- Conflicts --------------------------------------------------------------------------------- tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
 library(readxl)
 #list
 df = list.files(path = "./annual")
@@ -344,9 +330,83 @@ hatecrime_count_df %>%
 
 We first created a simple plot to see how hate crimes in the U.S. changed from 2005 to 2017. This was done by aggregating the yearly hate crime reports and creating a line chart depicting the total number of hate crime incidences over the specified timeline. We used the incidence counts rather than offenses for simplicity, since there could be multiple offenses commited per incident.
 
+``` r
+library(reshape2)
+
+hate_crime_10days<-read_csv("./data/hate_crime_10days.csv")
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   state = col_character(),
+    ##   hate_crimes_per_100k_splc = col_double()
+    ## )
+
+``` r
+hate_crime_ave<-hate_crime %>% 
+  na.omit() %>% 
+  filter(year==2016) 
+
+
+compare_rate<-merge(hate_crime_10days, hate_crime_ave, by= "state")
+
+compare_rate %>% 
+  mutate(hate_crimes_10days = hate_crimes_per_100k_splc/10 * 365,
+         hate_crimes_2016 = annualprop) %>% 
+  select(state, hate_crimes_10days, hate_crimes_2016) %>% 
+  melt(, id = "state") %>% 
+  mutate(state = factor(state, levels = state %>% unique %>% sort(decreasing = T))) %>% 
+  mutate(state = reorder(state, value)) %>% 
+  ggplot(aes(x = state, y = value, fill = variable, group = variable))+
+  geom_bar(stat="identity", position = "dodge", width = 0.5)+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60))+
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 0, size = 10, hjust = 1),legend.position = "right") +
+  ggtitle("Hate Crime Rate Before and After Trump Election") +
+  labs(y = "Hate Crime Rate (per 100,000)", x = "State")
+```
+
+![](report_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
 Next we tried to see if there was a change in the hate crime rate after Trump was elected. We did this by creating a stacked bar plot comparing the hate crime rate for 2016 to the hate crime rate in the 10 days after the election. To accurately compare these figures, we extrapolated the yearly equivalent for the hate crime rate for the 10 days after the election. This was done by calculating the average daily hate crime rate in the 10 day period and multiplying by 365.
 
-Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016. When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
+``` r
+map_data_2016 = merge_data %>%
+  rbind(c("Hawaii",71223,   0.034, 0.904,   0 ,0.81, '33.1%', 0 ,0)) %>% 
+  as.tibble() %>% 
+  arrange(state)
+
+map_data<-map_data_2016 %>%         
+  mutate(
+         state = as.factor(state),
+         code = state.abb[state],
+         code = c(code[1:8],'DC',code[9:50]),
+         hover = with(map_data_2016, paste(state,'<br>' ,"share for trump",share_voters_voted_trump)),
+         crime_rate = as.numeric(crime_rate)
+         ) %>% 
+  select(code, crime_rate, hover)
+
+l <- list(color = toRGB("grey"), width = 1)
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = F
+)
+
+
+plot_geo(map_data, locationmode = 'USA-states') %>%
+  add_trace(
+    z = ~ crime_rate, text = ~hover, locations = ~code,
+    color = ~ crime_rate, colors = 'Reds',marker = list(line = l)
+  ) %>%
+  colorbar(title = "Hate crime rate ") %>%
+  layout(
+    title = 'Hate crime rate in 2016 all over U.S. ',
+    geo = g
+  )
+```
+
+Initially, we wanted to show how the hate crime rate changed as the percent of trump voters increased. However, since, many states shared similar proportions of Trump voters, the plot was not able to accurately show this change. Instead, we decided to create an interactive map of the U.S. that showed the hate crime rate for each state and its share of Trump voters for 2016 (This is an interactive plot which can not be showne in md file, please refer to webstie). When creating the map, R was not recognizing "District of Columbia" as a state since it was not abbreviated like the other states. Therefore we manipulated the code to make R recognize this value.
 
 Inspired by these heat maps, we decided to create a shiny app containing heat maps depicting the hate crime rate for the years 2005 to 2017. These maps allowed for analysis of the variation in the crime rate amongst the states.
 
@@ -381,7 +441,7 @@ merge_data %>%
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](report_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](report_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ``` r
 ##do stepwise regerssion elimination
@@ -479,6 +539,10 @@ library(MASS)
     ## 
     ## Attaching package: 'MASS'
 
+    ## The following object is masked from 'package:plotly':
+    ## 
+    ##     select
+
     ## The following object is masked from 'package:dplyr':
     ## 
     ##     select
@@ -487,7 +551,7 @@ library(MASS)
 boxcox(multi.fit)
 ```
 
-![](report_files/figure-markdown_github/unnamed-chunk-3-2.png)
+![](report_files/figure-markdown_github/unnamed-chunk-8-2.png)
 
 ``` r
 # transform crime rate variable
